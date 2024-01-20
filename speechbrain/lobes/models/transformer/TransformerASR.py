@@ -202,30 +202,34 @@ class TransformerASR(TransformerInterface):
             pos_embs=pos_embs_encoder,
         )
 
-        tgt = self.custom_tgt_module(tgt)
+        
+        if hasattr(self, 'decoder'):
+            tgt = self.custom_tgt_module(tgt)
 
-        if self.attention_type == "RelPosMHAXL":
-            tgt = tgt + self.positional_encoding_decoder(tgt)
-            pos_embs_encoder = None  # self.positional_encoding(src)
-            pos_embs_target = None
-        elif (
-            self.positional_encoding_type == "fixed_abs_sine"
-            or self.attention_type == "hypermixing"
-        ):
-            tgt = tgt + self.positional_encoding(tgt)
-            pos_embs_target = None
-            pos_embs_encoder = None
+            if self.attention_type == "RelPosMHAXL":
+                tgt = tgt + self.positional_encoding_decoder(tgt)
+                pos_embs_encoder = None  # self.positional_encoding(src)
+                pos_embs_target = None
+            elif (
+                self.positional_encoding_type == "fixed_abs_sine"
+                or self.attention_type == "hypermixing"
+            ):
+                tgt = tgt + self.positional_encoding(tgt)
+                pos_embs_target = None
+                pos_embs_encoder = None
 
-        decoder_out, _, _ = self.decoder(
-            tgt=tgt,
-            memory=encoder_out,
-            memory_mask=src_mask,
-            tgt_mask=tgt_mask,
-            tgt_key_padding_mask=tgt_key_padding_mask,
-            memory_key_padding_mask=src_key_padding_mask,
-            pos_embs_tgt=pos_embs_target,
-            pos_embs_src=pos_embs_encoder,
-        )
+            decoder_out, _, _ = self.decoder(
+                tgt=tgt,
+                memory=encoder_out,
+                memory_mask=src_mask,
+                tgt_mask=tgt_mask,
+                tgt_key_padding_mask=tgt_key_padding_mask,
+                memory_key_padding_mask=src_key_padding_mask,
+                pos_embs_tgt=pos_embs_target,
+                pos_embs_src=pos_embs_encoder,
+            )
+        else:
+            decoder_out = None
 
         return encoder_out, decoder_out
 
