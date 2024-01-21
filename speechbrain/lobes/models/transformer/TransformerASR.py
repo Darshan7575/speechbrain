@@ -202,8 +202,8 @@ class TransformerASR(TransformerInterface):
             pos_embs=pos_embs_encoder,
         )
         
-        if isinstance(encoder_out,tuple):
-            encoder_out_dec = encoder_out[-1]
+        if isinstance(encoder_out, tuple):
+            encoder_out_dec = encoder_out[0]
         else:
             encoder_out_dec = encoder_out
         
