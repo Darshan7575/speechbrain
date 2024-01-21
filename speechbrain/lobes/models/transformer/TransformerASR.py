@@ -201,7 +201,11 @@ class TransformerASR(TransformerInterface):
             src_key_padding_mask=src_key_padding_mask,
             pos_embs=pos_embs_encoder,
         )
-
+        
+        if isinstance(encoder_out,tuple):
+            encoder_out_dec = encoder_out[-1]
+        else:
+            encoder_out_dec = encoder_out
         
         if hasattr(self, 'decoder'):
             tgt = self.custom_tgt_module(tgt)
@@ -220,7 +224,7 @@ class TransformerASR(TransformerInterface):
 
             decoder_out, _, _ = self.decoder(
                 tgt=tgt,
-                memory=encoder_out,
+                memory=encoder_out_dec,
                 memory_mask=src_mask,
                 tgt_mask=tgt_mask,
                 tgt_key_padding_mask=tgt_key_padding_mask,
